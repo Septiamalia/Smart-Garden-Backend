@@ -42,18 +42,21 @@ app.get("/status", (req, res) => {
 // 📊 DATA SENSOR (buat dashboard web)
 app.get("/sensor-data", (req, res) => {
   res.json({
-    suhu,
-    humidity,
-    light
+    suhu: suhu || 0,
+    humidity: humidity || 0,
+    light: light || 0
   });
 });
 
 // 🌱 DATA DARI ESP32
 app.post("/sensor", (req, res) => {
-  kondisi = req.body.kondisi;
-  suhu = req.body.suhu;
-  humidity = req.body.humidity;
-  light = req.body.light;
+  console.log("📥 BODY:", req.body); // 🔥 DEBUG
+
+  // fallback biar ga undefined
+  kondisi = req.body.kondisi || kondisi;
+  suhu = req.body.suhu ?? suhu;
+  humidity = req.body.humidity ?? humidity;
+  light = req.body.light ?? light;
 
   console.log("📥 Sensor:", kondisi, suhu, humidity, light);
 
@@ -61,9 +64,9 @@ app.post("/sensor", (req, res) => {
   if (kondisi === "Kering" && lastKondisi !== "Kering") {
     kirimTelegram(
       "⚠️ TANAH KERING!\n\n" +
-      "🌡️ Suhu: " + suhu + "°C\n" +
-      "💧 Humidity: " + humidity + "%\n" +
-      "☀️ Cahaya: " + light
+      "🌡️ Suhu: " + (suhu ?? "-") + "°C\n" +
+      "💧 Humidity: " + (humidity ?? "-") + "%\n" +
+      "☀️ Cahaya: " + (light ?? "-")
     );
   }
 
@@ -80,10 +83,10 @@ app.post("/siram", (req, res) => {
 
   kirimTelegram(
     "💧 TANAMAN DISIRAM\n\n" +
-    "🌡️ Suhu: " + suhu + "°C\n" +
-    "💧 Humidity: " + humidity + "%\n" +
-    "☀️ Cahaya: " + light + "\n" +
-    "🌱 Kondisi: " + kondisi
+    "🌡️ Suhu: " + (suhu ?? "-") + "°C\n" +
+    "💧 Humidity: " + (humidity ?? "-") + "%\n" +
+    "☀️ Cahaya: " + (light ?? "-") + "\n" +
+    "🌱 Kondisi: " + (kondisi ?? "-")
   );
 
   res.send("ON");
@@ -113,7 +116,7 @@ process.on("uncaughtException", (err) => {
   console.log("❌ ERROR:", err);
 });
 
-// 🚀 RUN SERVER (WAJIB UNTUK RAILWAY)
+// 🚀 RUN SERVER
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("Server jalan di " + PORT);
