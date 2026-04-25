@@ -1,4 +1,4 @@
-const API = "http://localhost:3000";
+const API = "https://smart-garden-backend-production-9935.up.railway.app";
 
 async function getStatus() {
   const res = await fetch(API + "/status");
