@@ -14,5 +14,13 @@
     "axios": "^1.15.2",
     "cors": "^2.8.6",
     "express": "^5.2.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Septiamalia/Smart-Garden-Backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Septiamalia/Smart-Garden-Backend/issues"
+  },
+  "homepage": "https://github.com/Septiamalia/Smart-Garden-Backend#readme"
 }
