@@ -10,6 +10,10 @@ let kondisi = "Basah";
 let pump = "OFF";
 let lastKondisi = "";
 
+let suhu = 0;
+let humidity = 0;
+let light = 0;
+
 const TOKEN = "8771973466:AAFhS4_Lh3BQI_bfyk2-yivd0BMP818dr_8";
 const CHAT_ID = "1868833642";
 
@@ -30,20 +34,37 @@ app.get("/", (req, res) => {
   res.send("Backend jalan");
 });
 
-// 📊 STATUS
+// 📊 STATUS (buat web)
 app.get("/status", (req, res) => {
   res.json({ kondisi, pump });
+});
+
+// 📊 DATA SENSOR (buat dashboard web)
+app.get("/sensor-data", (req, res) => {
+  res.json({
+    suhu,
+    humidity,
+    light
+  });
 });
 
 // 🌱 DATA DARI ESP32
 app.post("/sensor", (req, res) => {
   kondisi = req.body.kondisi;
+  suhu = req.body.suhu;
+  humidity = req.body.humidity;
+  light = req.body.light;
 
-  console.log("📥 Sensor:", kondisi);
+  console.log("📥 Sensor:", kondisi, suhu, humidity, light);
 
   // 🔥 Anti spam Telegram
   if (kondisi === "Kering" && lastKondisi !== "Kering") {
-    kirimTelegram("⚠️ Tanah kering!");
+    kirimTelegram(
+      "⚠️ TANAH KERING!\n\n" +
+      "🌡️ Suhu: " + suhu + "°C\n" +
+      "💧 Humidity: " + humidity + "%\n" +
+      "☀️ Cahaya: " + light
+    );
   }
 
   lastKondisi = kondisi;
@@ -56,12 +77,19 @@ app.post("/siram", (req, res) => {
   console.log("🔥 /siram dipanggil");
 
   pump = "ON";
-  kirimTelegram("💧 Disiram dari web");
+
+  kirimTelegram(
+    "💧 TANAMAN DISIRAM\n\n" +
+    "🌡️ Suhu: " + suhu + "°C\n" +
+    "💧 Humidity: " + humidity + "%\n" +
+    "☀️ Cahaya: " + light + "\n" +
+    "🌱 Kondisi: " + kondisi
+  );
 
   res.send("ON");
 });
 
-// ❗ Biar ga error kalau dibuka di browser
+// ❗ biar ga error kalau dibuka di browser
 app.get("/siram", (req, res) => {
   res.send("Gunakan POST untuk siram");
 });
